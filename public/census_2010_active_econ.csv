@@ -1,0 +1,57 @@
+OBJECTID;PLN_AREA_N_FROM;PLN_AREA_C;PLN_AREA_N_TO;Cash Flow;Good Flow
+1;Pasir Ris;PR;Changi;68701;1232
+2;Mandai;MD;Sembawang;832;34
+3;Outram;OT;Jurong East;8844;124
+4;Marina South;MS;Pioneer;784;325
+5;Straits View;SV;Boon Lay;84651;452
+6;Changi;CH;Bukit Merah;1217;34
+7;Sembawang;SB;Western Water Catchment;39651;124
+8;Jurong East;JE;Ang Mo Kio;47041;325
+9;Pioneer;PN;Singapore River;74000;34
+10;Boon Lay;BL;Queenstown;6300;124
+11;Bukit Merah;BM;North-Eastern Islands;82222;325
+12;Western Water Catchment;WC;Bukit Panjang;7550;34
+13;Ang Mo Kio;AM;Tanglin;95648;124
+14;Jurong West;JW;Geylang;144754;325
+15;Tengah;TH;Punggol;39651;34
+16;Orchard;OR;Bukit Timah;47041;124
+17;Choa Chu Kang;CK;Tuas;91189;464
+18;Simpang;SM;Boon Lay;24112;810
+19;Clementi;CL;Bukit Merah;47976;1300
+20;Paya Lebar;PL;Western Water Catchment;14762;1244
+21;Woodlands;WD;Ang Mo Kio;127256;1433
+22;Sengkang;SE;Jurong West;91353;124
+23;Yishun;YS;Tengah;98587;325
+24;Singapore River;SR;Orchard;906;34
+25;Queenstown;QT;Choa Chu Kang;48565;124
+26;North-Eastern Islands;NE;Simpang;1000;464
+27;Bukit Panjang;BP;Clementi;68701;810
+28;Tanglin;TN;Paya Lebar;8238;1300
+29;Geylang;GL;Woodlands;64449;1244
+30;Punggol;PG;Sengkang;32773;1433
+31;Bukit Timah;BT;Yishun;33461;124
+32;Tuas;TS;Singapore River;144754;325
+33;Lim Chu Kang;LK;Queenstown;39651;34
+34;Western Islands;WI;North-Eastern Islands;47041;124
+35;Tampines;TM;Bukit Panjang;136742;464
+36;Seletar;SL;Tanglin;52318;810
+37;Sungei Kadut;SK;Geylang;48526;1300
+38;Bukit Batok;BK;Punggol;65247;1244
+39;Museum;MU;Bukit Timah;25343;1433
+40;River Valley;RV;Tuas;4115;124
+41;Changi Bay;CB;Lim Chu Kang;3623;325
+42;Southern Islands;SI;Western Islands;3578;3444
+43;Central Water Catchment;CC;Tampines;2353;1232
+44;Newton;NT;Seletar;2737;34
+45;Marine Parade;MP;Sungei Kadut;22097;124
+46;Downtown Core;DT;Changi Bay;2019;325
+47;Kallang;KL;Southern Islands;52318;452
+48;Bishan;BS;Central Water Catchment;48526;34
+49;Toa Payoh;TP;Newton;65247;124
+50;Hougang;HG;Marine Parade;115269;325
+51;Serangoon;SG;Downtown Core;64807;34
+52;Bedok;BD;Kallang;154217;124
+53;Rochor;RC;Bishan;7934;325
+54;Marina East;ME;Toa Payoh;2313;34
+55;Novena;NV;Hougang;23543;124
+56;Others;OS;Serangoon;1430;325

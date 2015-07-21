@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Economically Active People by Planning Area</title>
+		<link rel="stylesheet" href="../leaflet/leaflet.css" />
+		<script src="../leaflet/leaflet.js"></script>
+		<script src="d3.v3.js" charset="utf-8"></script>
+		<script src="underscore-1.6.0.js" charset="utf-8"></script>
+		<script src="topojson.js" charset="utf-8"></script>
+		<script src="topojsonBipartite.js" charset="utf-8"></script>
+		<style type="text/css">
+			@import url(http://cdn.leafletjs.com/leaflet-0.6.1/leaflet.css)		
+		</style>
+	</head>
+	<body>
+		<div id="map" style="width: 800px; height: 500px"></div>
+		<script type="text/javascript">
+		var map = L.map('map').setView([1.32,103.82], 11);
+		mapLink = 
+            '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+        L.tileLayer(
+            'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; ' + mapLink + ' Contributors',
+            maxZoom: 18,
+            }).addTo(map);
+			
+		// Location of input files and variables
+		var csv = "census_2010_active_econ.csv" // csv file containing the data
+		var targetVar = "Econ Active Total" // target variable to display from the csv file
+		var csvZone = "PLN_AREA_C" // column where the zone info is stored. It should be unique zone IDs that match jsonZone
+		
+		var jsonFile = "census_2010_pln_areas_latlon.json" // GeoJSON file containing geographic information
+		var jsonZone = "PLN_AREA_C" // variable where the zone info is stored. It should be unique zone IDs that match csvZone
+		var jsonZoneLabel = "PLN_AREA_N" // variable where the actual name of the zone is stored. Will be used for labels.
+		var unit = "people" // unit to display in labels for targetVar
+		
+		// Color scale for choropleth map
+		var color = d3.scale.quantize()
+					.range(["rgb(237,248,233)",
+							"rgb(186,228,179)",
+							"rgb(116,196,118)",
+							"rgb(49,163,84)", 
+							"rgb(0,109,44)"]);
+		
+		// display map code adapted from http://stackoverflow.com/questions/14646656/drawing-already-projected-geojson-map-in-d3-js
+		// plots without projections since the geojson already has cartesian coordinates (SVY21)
+
+		var height = 800;
+		var width  = 500;
+		
+		// Add an SVG element to Leaflet’s overlay pane
+		var svg = d3.select(map.getPanes().overlayPane).append("svg");
+		var g = svg.append("g").attr("class", "leaflet-zoom-hide");	
+		
+		// Load data
+		d3.csv(csv, function(data) {
+			// Maps the min/max of targetVar to min/max of color scale
+			color.domain([d3.min(data, function(d) {return d[targetVar];}), 
+						  d3.max(data, function(d) {return d[targetVar];})]);
+	
+			// Merge csv data with geojson data (cause can only bind one set of data to elements at a time)
+			d3.json(jsonFile, function(json) {
+				//  create a d3.geo.path to convert GeoJSON to SVG
+				var transform = d3.geo.transform({point: projectPoint});
+				var path = d3.geo.path().projection(transform);
+			var json =topojson.feature(json, json.objects.DISTRICT);
+			console.log('json',json);
+		
+				// Bind data and create one path per GeoJSON feature
+				d3_features = g.selectAll("path")
+				   .data(json.features)
+				   .enter()
+				   .append("path");	
+				map.on("viewreset", reset);
+				reset();
+				
+				// fit the SVG element to leaflet's map layer
+				function reset() {
+				
+					bounds = path.bounds(json);
+
+					var topLeft = bounds[0],
+						bottomRight = bounds[1];
+
+					svg .attr("width", bottomRight[0] - topLeft[0])
+						.attr("height", bottomRight[1] - topLeft[1])
+						.style("left", topLeft[0] + "px")
+						.style("top", topLeft[1] + "px");
+
+					g.attr("transform", "translate(" + -topLeft[0] + "," 
+													  + -topLeft[1] + ")");
+
+					// initialize the path data.
+					// all visual elements should be in this part					
+					d3_features.attr("d", path)
+						.style("fill-opacity", 0.7)
+						.attr("fill", function(d) {
+							var value = d.properties[targetVar]; // Get data value
+							if (value) { // If value exists
+								return color(value);
+								}
+							else { // If value does not exist
+								return "#eee"; //Light Grey
+								}
+							})
+			    
+						// Draw Border
+						.style("stroke-width", "0.5px")
+						.style("stroke", "#ccc")
+						
+						// Highlight border on mouseover
+						.on("mouseover", function(d){
+						d3.select(this)
+							.style("stroke-width", "1.0px")
+							.style("stroke", "orange");
+							})
+						// Remove border highlight on mouseout
+						.on("mouseout", function(d){
+						d3.select(this)
+							.style("stroke-width", "0.5px")
+							.style("stroke", "#ccc");
+							})
+						
+						// Label
+						.append("title")
+						.text(function(d) {return (d.properties[jsonZoneLabel] + ": " + d.properties[targetVar] + " " + unit)});
+					}
+				
+				// Use Leaflet to implement a D3 geometric transformation.
+				function projectPoint(x, y) {
+					var point = map.latLngToLayerPoint(new L.LatLng(y,x));
+					this.stream.point(point.x, point.y);
+				}
+			
+			});	
+		});
+				
+		</script>
+	</body>
+</html>
