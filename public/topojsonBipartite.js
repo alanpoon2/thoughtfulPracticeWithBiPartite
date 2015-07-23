@@ -166,7 +166,7 @@ function ComboMap(){
 				_.each(polyToCentroidArr,function(u){
 					_.each(polyFromCentroidArr,function(i){
 					svg.append("path").datum({type: "LineString", coordinates: [[i.x, i.y], [u.x, u.y]]})
-						.attr("class","arc").attr("d",path);
+						.attr("class","arc").attr("d",path).style("stroke-width", "3.0px").attr("stroke","black");
 					});
 				});
 			
@@ -306,7 +306,7 @@ function ComboMap(){
 												totalSumFieldVals[j]=totalSumFieldVals[j]+parseFloat(m['SumFieldVals'][j]);
 												});
 											});	
-									var obj={}; obj['To']=d[0]['To']; obj['SumFieldVals']=holdingSumFieldVals;
+									var obj={}; obj[dataZone]=d[0]['To']; obj['SumFieldVals']=holdingSumFieldVals;
 									aData.push(obj);
 									}).entries(filteredData);
 							var lColors;
@@ -314,7 +314,7 @@ function ComboMap(){
 							colors=buildColors(lColors);
 						//setupColorScale
 						setupColorScale(aData);			
-						var obj_s ={}; obj_s['To']=s; obj_s['SumFieldVals']=totalSumFieldVals;
+						var obj_s ={}; obj_s[dataZone]=s; obj_s['SumFieldVals']=totalSumFieldVals;
 						var polyFromCentroidArr=[],polyToCentroidArr=[];
 						console.log('w...mapObj',JSON.stringify(mapObj.json.features[1].geometry.coordinates));
 						console.log('w...topoZone',topoZone);
@@ -332,7 +332,7 @@ function ComboMap(){
 						_.each(aData,function(d){
 						console.log('d',d);
 							for (var i=0;i<_.size(mapObj.json.features);i++){
-								if(mapObj.json.features[i].properties[topoZone]==d['To']) {
+								if(mapObj.json.features[i].properties[topoZone]==d[dataZone]) {
 									var polygon=_.map(mapObj.json.features[i].geometry.coordinates[0],function(m) {
 										return {x:m[0],y:m[1]};
 									});
