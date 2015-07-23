@@ -45,7 +45,9 @@ function ComboMap(){
 		attribution: '&copy; ' + mapLink + ' Contributors',
 		maxZoom: 18,
 		}).addTo(map);
-		var ll = new L.LatLng( 1.38201544874088,103.95321635529909),marker,tooltip;
+		//var ll = new L.LatLng( 1.38201544874088,103.95321635529909),marker,tooltip;
+		//var ll = new L.LatLng(103.99782232969187,	1.3508082251695164),marker,tooltip;
+		var ll = new L.LatLng(1.3508082251695164,103.99782232969187),marker,tooltip;
 		 marker = L.marker(ll).addTo(map);
 	 tooltip = L.tooltip({
           target: marker,
@@ -160,13 +162,23 @@ function ComboMap(){
 		return chart;
 		function debugFn2(){
 			arrowGen = function(polyFromCentroidArr,polyToCentroidArr){
+				var delta=function(path) {
+				  var l = path.getTotalLength();
+				  return function(i) {
+					return function(t) {
+					  var p = path.getPointAtLength(t * l);
+					  return "translate(" + p.x + "," + p.y + ")";
+					}
+				  }
+				};
+
 					var transform=formatTransform(formatProjectPoint);
 				var path=formatPath(transform);
 			console.log('polyFromCentroidArr',polyFromCentroidArr,'polyToCentroidArr',polyToCentroidArr);
 				_.each(polyToCentroidArr,function(u){
 					_.each(polyFromCentroidArr,function(i){
-					svg.append("path").datum({type: "LineString", coordinates: [[i.x, i.y], [u.x, u.y]]})
-						.attr("class","arc").attr("d",path).style("stroke-width", "3.0px").attr("stroke","black");
+					g.append("path").datum({type: "LineString", coordinates: [[i.x, i.y], [u.x, u.y]]})
+						.attr("class","arc").attr("d",delta(path)).style("stroke-width", "3.0px").attr("stroke","black");
 					});
 				});
 			
