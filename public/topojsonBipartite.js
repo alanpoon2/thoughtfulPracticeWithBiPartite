@@ -159,6 +159,19 @@ function ComboMap(){
 		};
 		return chart;
 		function debugFn2(){
+			arrowGen = function(polyFromCentroidArr,polyToCentroidArr){
+					var transform=formatTransform(formatProjectPoint);
+				var path=formatPath(transform);
+			console.log('polyFromCentroidArr',polyFromCentroidArr,'polyToCentroidArr',polyToCentroidArr);
+				_.each(polyToCentroidArr,function(u){
+					_.each(polyFromCentroidArr,function(i){
+					svg.append("path").datum({type: "LineString", coordinates: [[i.x, i.y], [u.x, u.y]]})
+						.attr("class","arc").attr("d",path);
+					});
+				});
+			
+			};
+		
 			buildColors = function (legendColors){
 				var _colorRange=[legendColors.min,legendColors.max];
 				var colorScale = d3.scale.linear()
@@ -239,7 +252,7 @@ function ComboMap(){
 				return mapObjBind;
 			};
 			usualUnSelP =function(mapObj,metaData){
-				var topoZone=megaStatus['topoZone'];
+				var dataZone=megaStatus['topoZone'];
 				// Aggregate by topoZone
 					var holdingSumFieldVals={};
 					_.each(Fselect['sumField'],function(j){
@@ -247,7 +260,7 @@ function ComboMap(){
 							});
 					var clonedSumFieldVals=_.clone(holdingSumFieldVals);
 					var aData=[];
-				var nest =d3.nest().key(function(d){ return d[topoZone];})
+				var nest =d3.nest().key(function(d){ return d[dataZone];})
 							.rollup(function(d){
 								holdingSumFieldVals=_.clone(clonedSumFieldVals);
 									_.each(d,function(m){
@@ -255,7 +268,7 @@ function ComboMap(){
 												holdingSumFieldVals[j]=holdingSumFieldVals[j]+parseFloat(m['SumFieldVals'][j]);
 												});
 											}); 
-							var obj={}; obj[topoZone]=d[0][topoZone]; obj['SumFieldVals']=holdingSumFieldVals;
+							var obj={}; obj[dataZone]=d[0][dataZone]; obj['SumFieldVals']=holdingSumFieldVals;
 							aData.push(obj);
 							}).entries(metaData);
 							console.log('unsel',aData[0]);
@@ -274,7 +287,7 @@ function ComboMap(){
 				'default':{'unSel':function(mapObj,metaData){return usualUnSelP(mapObj,metaData)}},
 				'transfer':{
 					'From':function(mapObj,metaData,s){
-						var topoZone=megaStatus['topoZone'];
+						var dataZone=megaStatus['topoZone'];
 						var holdingSumFieldVals={};
 						_.each(Fselect['sumField'],function(j){
 							holdingSumFieldVals[j]=0;
@@ -283,7 +296,6 @@ function ComboMap(){
 						var clonedSumFieldVals=_.clone(holdingSumFieldVals);
 						var aData=[];
 						var filteredData=_.where(metaData,{'From':s}); 
-						console.log('s',s,'++metaData by filtered',JSON.stringify(_.first(metaData,10)));
 						console.log('filteredData',JSON.stringify(filteredData));
 						var nest = d3.nest().key(function(d) {return d.To;})
 									.rollup(function(d) {
@@ -294,7 +306,7 @@ function ComboMap(){
 												totalSumFieldVals[j]=totalSumFieldVals[j]+parseFloat(m['SumFieldVals'][j]);
 												});
 											});	
-									var obj={}; obj[topoZone]=d[0]['To']; obj['SumFieldVals']=holdingSumFieldVals;
+									var obj={}; obj['To']=d[0]['To']; obj['SumFieldVals']=holdingSumFieldVals;
 									aData.push(obj);
 									}).entries(filteredData);
 							var lColors;
@@ -302,34 +314,35 @@ function ComboMap(){
 							colors=buildColors(lColors);
 						//setupColorScale
 						setupColorScale(aData);			
-						var obj_s ={}; obj_s[topoZone]=s; obj_s['SumFieldVals']=totalSumFieldVals;
+						var obj_s ={}; obj_s['To']=s; obj_s['SumFieldVals']=totalSumFieldVals;
 						var polyFromCentroidArr=[],polyToCentroidArr=[];
+						console.log('w...mapObj',JSON.stringify(mapObj.json.features[1].geometry.coordinates));
+						console.log('w...topoZone',topoZone);
 						for (var i=0;i<_.size(mapObj.json.features);i++){
 							if(mapObj.json.features[i].properties[topoZone]==s){
-								var polygon=_.map(mapObj.json.geometry[0],function(d) {
-									return {x:d[0],y:d[1]};
+								var polygon=_.map(mapObj.json.features[i].geometry.coordinates[0],function(m) {
+									return {x:m[0],y:m[1]};
 								});
 								var region = new Region(polygon);
-								polyFromCentroidArr.push(region);
+								polyFromCentroidArr.push(region.centroid());
 								break;
 							}
 						}
+						console.log('aData',aData);
 						_.each(aData,function(d){
+						console.log('d',d);
 							for (var i=0;i<_.size(mapObj.json.features);i++){
-								if(d['To']==mapObj.json.features[i].properties[topoZone]) {
-									var polygon=_.map(mapObj.json.geometry[0],function(d) {
-										return {x:d[0],y:d[1]};
+								if(mapObj.json.features[i].properties[topoZone]==d['To']) {
+									var polygon=_.map(mapObj.json.features[i].geometry.coordinates[0],function(m) {
+										return {x:m[0],y:m[1]};
 									});
 									var region = new Region(polygon);
-									polyToCentroidArr.push(region);
+									polyToCentroidArr.push(region.centroid());
 									break;
 								}
 							}
 						});
-						arrowGen = function(polyFromCentroidArr,polyToCentroidArr){
-						
-						
-						};
+						arrowGen(polyFromCentroidArr,polyToCentroidArr);
 						aData.push(obj_s);
 						console.log('aData in From',aData);
 						//remove 'SumFieldVals' from the features
@@ -340,7 +353,7 @@ function ComboMap(){
 						return standardMappingJSON(formattedMapObj,aData);
 					},
 					'To':function(mapObj,metaData,s){
-						var topoZone=megaStatus['topoZone'];
+						var dataZone=megaStatus['topoZone'];
 						var holdingSumFieldVals={};
 						_.each(Fselect['sumField'],function(j){
 							holdingSumFieldVals[j]=0;
@@ -360,14 +373,14 @@ function ComboMap(){
 												totalSumFieldVals[j]=totalSumFieldVals[j]+parseFloat(m['SumFieldVals'][j]);
 												});
 											});	
-									var obj={}; obj[topoZone]=d[0]['From']; obj['SumFieldVals']=holdingSumFieldVals;
+									var obj={}; obj[dataZone]=d[0]['From']; obj['SumFieldVals']=holdingSumFieldVals;
 									aData.push(obj);
 									}).entries(filteredData);
 						var lColors={min:'#CCCCFF',max:'#000066',empty:'#efefef'};
 						colors=buildColors(lColors);
 						//setupColorScale
 						setupColorScale(aData);
-						var obj_s ={}; obj_s[topoZone]=s; obj_s['SumFieldVals']=totalSumFieldVals;
+						var obj_s ={}; obj_s[dataZone]=s; obj_s['SumFieldVals']=totalSumFieldVals;
 						aData.push(obj_s);
 							//remove 'SumFieldVals' from the features
 						_.each(formattedMapObj.json.features,function(d,i){
