@@ -170,7 +170,7 @@ function ComboMap(){
 				  dr = Math.sqrt(dx * dx + dy * dy);
 			  return "M" + d.coordinates[0][0] + "," + d.coordinates[0][1] + "A" + dr + "," + dr + " 0 0,1 " +d.coordinates[1][0]+ "," + d.coordinates[1][1];
 			}
-							   
+							  //https://groups.google.com/forum/#!msg/d3-js/MLZX1AbS7-Y/IxlWHVRlmpYJ 
 					var transform=formatTransform(formatProjectPoint);
 					var formatPath = function(transform){return d3.geo.path()
 					.pointRadius(2)
@@ -182,7 +182,7 @@ function ComboMap(){
 					g.append("path").datum({type: "LineString", coordinates: [[i.x, i.y], [u.x, u.y]]})
 						.attr("class","arc").attr("d",function(d){
 						console.log('d arc',d);
-						return path(d);}).style("stroke-width", "3.0px").attr("stroke","black");
+						return linkArc(path(d));}).style("stroke-width", "3.0px").attr("stroke","black");
 					});
 				});
 			
