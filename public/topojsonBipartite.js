@@ -162,23 +162,27 @@ function ComboMap(){
 		return chart;
 		function debugFn2(){
 			arrowGen = function(polyFromCentroidArr,polyToCentroidArr){
-				var delta=function(path) {
-				  var l = path.getTotalLength();
-				  return function(i) {
-					return function(t) {
-					  var p = path.getPointAtLength(t * l);
-					  return "translate(" + p.x + "," + p.y + ")";
-					}
-				  }
-				};
-
+			//remove all previous lines
+			g.selectAll(".arc").remove();
+				function linkArc(d) {
+			  var dx = d.coordinates[1][0] - d.coordinates[0][0],
+				  dy = d.coordinates[1][1] - d.coordinates[0][1],
+				  dr = Math.sqrt(dx * dx + dy * dy);
+			  return "M" + d.coordinates[0][0] + "," + d.coordinates[0][1] + "A" + dr + "," + dr + " 0 0,1 " +d.coordinates[1][0]+ "," + d.coordinates[1][1];
+			}
+							   
 					var transform=formatTransform(formatProjectPoint);
+					var formatPath = function(transform){return d3.geo.path()
+					.pointRadius(2)
+					.projection(transform);};
 				var path=formatPath(transform);
 			console.log('polyFromCentroidArr',polyFromCentroidArr,'polyToCentroidArr',polyToCentroidArr);
 				_.each(polyToCentroidArr,function(u){
 					_.each(polyFromCentroidArr,function(i){
 					g.append("path").datum({type: "LineString", coordinates: [[i.x, i.y], [u.x, u.y]]})
-						.attr("class","arc").attr("d",delta(path)).style("stroke-width", "3.0px").attr("stroke","black");
+						.attr("class","arc").attr("d",function(d){
+						console.log('d arc',d);
+						return path(d);}).style("stroke-width", "3.0px").attr("stroke","black");
 					});
 				});
 			
